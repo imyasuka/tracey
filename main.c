@@ -145,6 +145,7 @@ int main(int argc, char** argv, char** envp) {
 		return 0;
 	}
 	if (arg(1, "help")) {
+		if (argc == 2) goto general_help;	
 		if (arg(2, "timer")) {
 			printf("\n");
 			tracey_help_timer();
@@ -163,6 +164,7 @@ int main(int argc, char** argv, char** envp) {
 			printf("\n");
 			return 0;
 		}
+general_help:
 		printf("\n");
 		printf("tracey help					               prints this help screen\n");
 		printf("\n");

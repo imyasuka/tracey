@@ -141,7 +141,7 @@ int main(int argc, char** argv, char** envp) {
 		printf("tracey sub <ITEM>\n");
 		printf("            subtracts variables found in <ITEM> and decrements <ITEM> count in a trace\n");
 		printf("\n");
-
+		return 0;
 	}
 	if (arg(1, "start")) {
 		if (argc == 2) {

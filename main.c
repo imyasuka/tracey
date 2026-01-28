@@ -113,7 +113,35 @@ int main(int argc, char** argv, char** envp) {
 	if (argc == 1) {
 		printf("TRACEY v1\n");
 		printf("Idiosyncratized tracker.\n");
+		printf("Type \"tracey help\" for more info.\n");
 		return 0;
+	}
+	if (arg(1, "help")) {
+		printf("tracey help					               prints this help screen\n");
+		printf("\n");
+		printf("tracey help timer				prints this section of the help screen\n");
+		printf("tracey start [timer]					 	     creates a [timer]\n");
+		printf("tracey time [timer]    		       outputs time elapsed since the start of [timer]\n");
+		printf("tracey time [timer] into [variable]\n");
+		printf("	    outputs time elapsed since the start of [timer] into [variable] in a trace\n");
+		printf("tracey stop [timer]					             removes a [timer]\n");
+		printf("\n");
+		printf("tracey help trace				prints this section of the help screen\n");
+		printf("tracey set [variable] [value]			 sets [variable] to [value] in a trace\n");
+		printf("tracey add [variable] [amount]		  increments [variable] by [amount] in a trace\n");
+		printf("tracey sub [variable] [amount]	       	  decrements [variable] by [amount] in a trace\n");
+		printf("tracey mul [variable] [amount]            multiplies [variable] by [amount] in a trace\n");
+		printf("tracey div [variable] [amount]		     divides [variable] by [amount] in a trace\n");
+		printf("tracey erase [variable]				      erases a [variable] from a trace\n");
+		printf("\n");
+		printf("tracey help item				prints this section of the help screen\n");
+		printf("tracey def [item] <[variable] [value] ...>	    creates an [item] with [variable]s\n");
+		printf("tracey add [item]\n");
+		printf("                 adds variables found in [item] and increments [item] count in a trace\n");
+		printf("tracey sub [item]\n");
+		printf("            subtracts variables found in [item] and decrements [item] count in a trace\n");
+		printf("\n");
+
 	}
 	if (arg(1, "start")) {
 		if (argc == 2) {

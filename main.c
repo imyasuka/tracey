@@ -109,6 +109,34 @@ void trace_add_line(trace* file, const char* line) {
 	strcpy(file->trace[file->lines - 1], line);
 }
 
+void tracey_help_timer() {
+	printf("tracey help timer				prints this section of the help screen\n");
+	printf("tracey start <TIMER>					 	     creates a <TIMER>\n");
+	printf("tracey time <TIMER>    		       outputs time elapsed since the start of <TIMER>\n");
+	printf("tracey time <TIMER> into <VARIABLE>\n");
+	printf("	    outputs time elapsed since the start of <TIMER> into <VARIABLE> in a trace\n");
+	printf("tracey stop <TIMER>					             removes a <TIMER>\n");
+}
+
+void tracey_help_trace() {
+	printf("tracey help trace				prints this section of the help screen\n");
+	printf("tracey set <VARIABLE> <VALUE>			 sets <VARIABLE> to <VALUE> in a trace\n");
+	printf("tracey add <VARIABLE> <AMOUNT>		  increments <VARIABLE> by <AMOUNT> in a trace\n");
+	printf("tracey sub <VARIABLE> <AMOUNT>	       	  decrements <VARIABLE> by <AMOUNT> in a trace\n");
+	printf("tracey mul <VARIABLE> <AMOUNT>            multiplies <VARIABLE> by <AMOUNT> in a trace\n");
+	printf("tracey div <VARIABLE> <AMOUNT>		     divides <VARIABLE> by <AMOUNT> in a trace\n");
+	printf("tracey erase <VARIABLE>				      erases a <VARIABLE> from a trace\n");
+}
+
+void tracey_help_item() {
+	printf("tracey help item				prints this section of the help screen\n");
+	printf("tracey def <ITEM> [<VARIABLE> <VALUE>]	    creates an <ITEM> with <VARIABLE>s\n");	
+	printf("tracey add <ITEM>\n");
+	printf("                 adds variables found in <ITEM> and increments <ITEM> count in a trace\n");
+	printf("tracey sub <ITEM>\n");
+	printf("            subtracts variables found in <ITEM> and decrements <ITEM> count in a trace\n");
+}
+
 int main(int argc, char** argv, char** envp) {
 	if (argc == 1) {
 		printf("TRACEY v1\n");
@@ -117,29 +145,32 @@ int main(int argc, char** argv, char** envp) {
 		return 0;
 	}
 	if (arg(1, "help")) {
+		if (arg(2, "timer")) {
+			printf("\n");
+			tracey_help_timer();
+			printf("\n");
+			return 0;
+		}
+		if (arg(2, "trace")) {
+			printf("\n");
+			tracey_help_trace();
+			printf("\n");
+			return 0;
+		}
+		if (arg(2, "item")) {
+			printf("\n");
+			tracey_help_item();
+			printf("\n");
+			return 0;
+		}
+		printf("\n");
 		printf("tracey help					               prints this help screen\n");
 		printf("\n");
-		printf("tracey help timer				prints this section of the help screen\n");
-		printf("tracey start <TIMER>					 	     creates a <TIMER>\n");
-		printf("tracey time <TIMER>    		       outputs time elapsed since the start of <TIMER>\n");
-		printf("tracey time <TIMER> into <VARIABLE>\n");
-		printf("	    outputs time elapsed since the start of <TIMER> into <VARIABLE> in a trace\n");
-		printf("tracey stop <TIMER>					             removes a <TIMER>\n");
+		tracey_help_timer();
 		printf("\n");
-		printf("tracey help trace				prints this section of the help screen\n");
-		printf("tracey set <VARIABLE> <VALUE>			 sets <VARIABLE> to <VALUE> in a trace\n");
-		printf("tracey add <VARIABLE> <AMOUNT>		  increments <VARIABLE> by <AMOUNT> in a trace\n");
-		printf("tracey sub <VARIABLE> <AMOUNT>	       	  decrements <VARIABLE> by <AMOUNT> in a trace\n");
-		printf("tracey mul <VARIABLE> <AMOUNT>            multiplies <VARIABLE> by <AMOUNT> in a trace\n");
-		printf("tracey div <VARIABLE> <AMOUNT>		     divides <VARIABLE> by <AMOUNT> in a trace\n");
-		printf("tracey erase <VARIABLE>				      erases a <VARIABLE> from a trace\n");
+		tracey_help_trace();
 		printf("\n");
-		printf("tracey help item				prints this section of the help screen\n");
-		printf("tracey def <ITEM> [<VARIABLE> <VALUE>]	    creates an <ITEM> with <VARIABLE>s\n");
-		printf("tracey add <ITEM>\n");
-		printf("                 adds variables found in <ITEM> and increments <ITEM> count in a trace\n");
-		printf("tracey sub <ITEM>\n");
-		printf("            subtracts variables found in <ITEM> and decrements <ITEM> count in a trace\n");
+		tracey_help_item();
 		printf("\n");
 		return 0;
 	}

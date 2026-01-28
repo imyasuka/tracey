@@ -139,8 +139,8 @@ void tracey_help_item() {
 
 int main(int argc, char** argv, char** envp) {
 	if (argc == 1) {
-		printf("TRACEY v1\n");
-		printf("Idiosyncratized tracker.\n");
+		printf("TRACEY\n");
+		printf("Idiosyncratic tracker.\n");
 		printf("Type \"tracey help\" for more info.\n");
 		return 0;
 	}

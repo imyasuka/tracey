@@ -302,8 +302,8 @@ general_help:
 			printf("tracey time <TIMER>\n");
 			return 0;
 		}
-		char* timer_name = malloc(strlen(argv[2]) + 10);
-		sprintf(timer_name, "%s.timer", argv[2]);
+		char* timer_name = malloc(strlen(pathstr) + strlen(argv[2]) + 10);
+		sprintf(timer_name, "%s%s.timer", pathstr, argv[2]);
 		FILE* timer = fopen(timer_name, "r");
 		if (timer == NULL) {
 			err(FILE_OPEN_FAIL);

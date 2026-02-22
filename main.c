@@ -24,8 +24,8 @@
 #define make_str(x, fmt, ...)\
 	char* x = malloc(sizeof(char) * 64);\
 	int x##needed = snprintf(x, 64, fmt, __VA_ARGS__);\
-	if (x##needed > 64) x = realloc(x, sizeof(char)*x##needed);\
-	snprintf(x, x##needed, fmt, __VA_ARGS__);
+	if (x##needed > 64) x = realloc(x, sizeof(char)*(x##needed + 1));\
+	snprintf(x, x##needed+1, fmt, __VA_ARGS__);
 
 const char* err_code[] = {
 	"Error: Variable not specified.",
@@ -182,7 +182,7 @@ int main(int argc, char** argv, char** envp) {
 		printf("Type \"tracey help\" for more info.\n");
 		return 0;
 	}
-	make_str(pathstr, "%s/tracey/PATH", home);
+	make_str(pathstr, "%s/.local/share/tracey/PATH", home);
 	FILE* path = fopen(pathstr, "r");
 	free(pathstr);
 	pathstr = NULL;
@@ -210,10 +210,10 @@ int main(int argc, char** argv, char** envp) {
 			return 0;
 		}
 		if (pathstr) free(pathstr);
-		make_str(temp, "%s/tracey/PATH", home);
+		make_str(temp, "%s/.local/share/tracey/PATH", home);
 		path = fopen(temp, "w+");
 		if (path != NULL) goto dir_exists;
-		make_str(dir, "%s/tracey", home);
+		make_str(dir, "%s/.local/share/tracey", home);
 		mode_t mode = 0755;
 		if (mkdir(dir, mode) == 0) {
 			free(dir);
@@ -238,9 +238,9 @@ int main(int argc, char** argv, char** envp) {
 			}
 			fclose(path);
 			if (argv[2][strlen(argv[2])-1] == '/')
-				printf("Success: Path set to %s.\n", argv[2]);
+				printf("Success: Path set to %s\n", argv[2]);
 			else 
-				printf("Success: Path set to %s/.\n", argv[2]);
+				printf("Success: Path set to %s/\n", argv[2]);
 			return 0;
 		} else {
 			free(dir);

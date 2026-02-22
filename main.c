@@ -13,6 +13,10 @@
 #define FILE_OPEN_FAIL 		5
 #define TIMER_INVALID           6
 #define FILE_REMOVE_FAIL	7
+#define TYPE_NOT_SPECIFIED      8
+#define NEW_NOT_SPECIFIED       9
+#define ITEM_NOT_SPECIFIED      10
+#define TYPE_INVALID            11
 
 const char* err_code[] = {
 	"Error: Variable not specified.",
@@ -22,7 +26,11 @@ const char* err_code[] = {
 	"Error: Failed to create file.",
 	"Error: Failed to open file.",
 	"Error: Invalid timer.",
-	"Error: Failed to remove file."
+	"Error: Failed to remove file.",
+	"Error: Type not specified.",
+	"Error: New name not specified.",
+	"Error: Item not specified.",
+	"Error: Invalid type."
 };
 
 void err(size_t n) {
@@ -111,11 +119,14 @@ void trace_add_line(trace* file, const char* line) {
 
 void tracey_help_timer() {
 	printf("tracey help timer				prints this section of the help screen\n");
-	printf("tracey start <TIMER>					 	     creates a <TIMER>\n");
+	printf("tracey start <TIMER>					 	       creates <TIMER>\n");
+	printf("tracey rename timer <OLD> <NEW>                           renames <OLD> timer to <NEW>\n");
 	printf("tracey time <TIMER>    		       outputs time elapsed since the start of <TIMER>\n");
 	printf("tracey time <TIMER> into <VARIABLE>\n");
 	printf("	    outputs time elapsed since the start of <TIMER> into <VARIABLE> in a trace\n");
-	printf("tracey stop <TIMER>					             removes a <TIMER>\n");
+	printf("tracey all timers         lists all timers and time elapsed since the creation of each\n");
+	printf("tracey stop <TIMER>					               removes <TIMER>\n");
+	printf("tracey copy <TIMER> <COPY>                                  copies <TIMER> into <COPY>\n");	
 }
 
 void tracey_help_trace() {
@@ -126,15 +137,25 @@ void tracey_help_trace() {
 	printf("tracey mul <VARIABLE> <AMOUNT>            multiplies <VARIABLE> by <AMOUNT> in a trace\n");
 	printf("tracey div <VARIABLE> <AMOUNT>		     divides <VARIABLE> by <AMOUNT> in a trace\n");
 	printf("tracey erase <VARIABLE>				      erases a <VARIABLE> from a trace\n");
+	printf("tracey trace					           outputs last trace contents\n");
+	printf("tracey trace <TRACE>    			       	      outputs <TRACE> contents\n");
+	printf("tracey all traces                                 list all traces and contents of each\n");
+	printf("tracey copy trace <TRACE>                               copies <TRACE> into last trace\n");
+	printf("tracey copy trace <TRACE> <COPY>                            copies <TRACE> into <COPY>\n");
 }
 
 void tracey_help_item() {
 	printf("tracey help item				prints this section of the help screen\n");
-	printf("tracey def <ITEM> [<VARIABLE> <VALUE>]	    creates an <ITEM> with <VARIABLE>s\n");	
+	printf("tracey new <ITEM> [<VARIABLE> <VALUE>]	               creates <ITEM> with <VARIABLE>s\n");
+	printf("tracey rename item <OLD> <NEW>                             renames <OLD> item to <NEW>\n");
 	printf("tracey add <ITEM>\n");
 	printf("                 adds variables found in <ITEM> and increments <ITEM> count in a trace\n");
 	printf("tracey sub <ITEM>\n");
 	printf("            subtracts variables found in <ITEM> and decrements <ITEM> count in a trace\n");
+	printf("tracey remove <ITEM>					                removes <ITEM>\n");
+	printf("tracey item <ITEM>					       outputs <ITEM> contents\n");
+	printf("tracey all items                                   list all items and contents of each\n");
+	printf("tracey copy item <ITEM> <COPY>                               copies <ITEM> into <COPY>\n");
 }
 
 int main(int argc, char** argv, char** envp) {
@@ -145,7 +166,7 @@ int main(int argc, char** argv, char** envp) {
 		return 0;
 	}
 	if (arg(1, "help")) {
-		if (argc == 2) goto general_help;	
+		if (argc == 2) goto general_help;
 		if (arg(2, "timer")) {
 			printf("\n");
 			tracey_help_timer();
@@ -242,6 +263,55 @@ general_help:
 			err(FILE_REMOVE_FAIL);
 			return 0;
 		}
+		return 0;
+	}
+	if (arg(1, "rename")) {
+		if (argc == 2) {
+			err(TYPE_NOT_SPECIFIED);
+			printf("tracey rename <TYPE> <OLD> <NEW>\n");
+			return 0;
+		}
+		if (arg(2, "timer")) {
+			if (argc == 3) {
+				err(TIMER_NOT_SPECIFIED);
+				printf("tracey rename timer <OLD> <NEW>\n");
+				return 0;
+			}
+			if (argc == 4) {
+				err(NEW_NOT_SPECIFIED);
+				printf("tracey rename timer %s <NEW>\n", argv[3]);
+				return 0;
+			}
+			char* old = malloc(strlen(argv[3]) + 10);
+			char* new = malloc(strlen(argv[4]) + 10);
+			sprintf(old, "%s.timer", argv[3]);
+			sprintf(new, "%s.timer", argv[4]);
+			rename(old, new);
+			free(old);
+			free(new);
+			return 0;	
+		}
+		if (arg(2, "item")) {
+			if (argc == 3) {
+				err(ITEM_NOT_SPECIFIED);
+				printf("tracey rename item <OLD> <NEW>\n");
+				return 0;
+			}
+			if (argc == 4) {
+				err(NEW_NOT_SPECIFIED);
+				printf("tracey rename item %s <NEW>\n", argv[3]);
+				return 0;
+			}
+			char* old = malloc(strlen(argv[3]) + 10);
+			char* new = malloc(strlen(argv[4]) + 10);
+			sprintf(old, "%s.timer", argv[3]);
+			sprintf(new, "%s.timer", argv[4]);
+			rename(old, new);
+			free(old);
+			free(new);
+			return 0;
+		}
+		err(TYPE_INVALID);
 		return 0;
 	}
 	time_t now = time(NULL);

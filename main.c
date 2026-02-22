@@ -21,6 +21,12 @@
 #define TYPE_INVALID            11
 #define PATH_SET_FAIL           12
 
+#define make_str(x, fmt, ...)\
+	char* x = malloc(sizeof(char) * 64);\
+	int x##needed = snprintf(x, 64, fmt, __VA_ARGS__);\
+	if (x##needed > 64) x = realloc(x, sizeof(char)*x##needed);\
+	snprintf(x, x##needed, fmt, __VA_ARGS__);
+
 const char* err_code[] = {
 	"Error: Variable not specified.",
 	"Error: Amount not specified.",
@@ -169,14 +175,17 @@ void tracey_help_item() {
 }
 
 int main(int argc, char** argv, char** envp) {
+	char* home = getenv("HOME");
 	if (argc == 1) {
 		printf("TRACEY\n");
 		printf("Idiosyncratic tracker.\n");
 		printf("Type \"tracey help\" for more info.\n");
 		return 0;
 	}
-	FILE* path = fopen(".tracey/PATH", "r");
-	char* pathstr = NULL;
+	make_str(pathstr, "%s/tracey/PATH", home);
+	FILE* path = fopen(pathstr, "r");
+	free(pathstr);
+	pathstr = NULL;
 	if (path != NULL) {
 		pathstr = read_line(path);
 		if (pathstr[strlen(pathstr)-1] != '/') {
@@ -201,12 +210,15 @@ int main(int argc, char** argv, char** envp) {
 			return 0;
 		}
 		if (pathstr) free(pathstr);
-		path = fopen(".tracey/PATH", "w+");
+		make_str(temp, "%s/tracey/PATH", home);
+		path = fopen(temp, "w+");
 		if (path != NULL) goto dir_exists;
-		const char* dir = ".tracey";
+		make_str(dir, "%s/tracey", home);
 		mode_t mode = 0755;
 		if (mkdir(dir, mode) == 0) {
-			path = fopen(".tracey/PATH", "w+");
+			free(dir);
+			path = fopen(temp, "w+");
+			free(temp);
 		dir_exists:
 			struct stat s;
 			if (path == NULL) {
@@ -231,6 +243,8 @@ int main(int argc, char** argv, char** envp) {
 				printf("Success: Path set to %s/.\n", argv[2]);
 			return 0;
 		} else {
+			free(dir);
+			free(temp);
 path_set_fail:
 			err(PATH_SET_FAIL);
 			return 0;
@@ -283,8 +297,7 @@ general_help:
 			printf("tracey start <TIMER>\n");
 			return 0;
 		}
-		char* timer_name = malloc(strlen(argv[2]) + 10);
-		sprintf(timer_name, "%s.timer", argv[2]);
+		make_str(timer_name, "%s%s.timer", pathstr, argv[2]);
 		FILE* timer = fopen(timer_name, "w");
 		if (timer == NULL) {
 			err(FILE_CREATION_FAIL);
@@ -302,8 +315,7 @@ general_help:
 			printf("tracey time <TIMER>\n");
 			return 0;
 		}
-		char* timer_name = malloc(strlen(pathstr) + strlen(argv[2]) + 10);
-		sprintf(timer_name, "%s%s.timer", pathstr, argv[2]);
+		make_str(timer_name, "%s%s.timer", pathstr, argv[2]);	
 		FILE* timer = fopen(timer_name, "r");
 		if (timer == NULL) {
 			err(FILE_OPEN_FAIL);
@@ -335,8 +347,7 @@ general_help:
 			printf("tracey stop <TIMER>\n");
 			return 0;
 		}
-		char* timer_name = malloc(strlen(pathstr) + strlen(argv[2]) + 10);
-		sprintf(timer_name, "%s%s.timer", pathstr, argv[2]);
+		make_str(timer_name, "%s%s.timer", pathstr, argv[2]);
 		int res = remove(timer_name);
 		free(timer_name);
 		if (res != 0) {
@@ -362,10 +373,8 @@ general_help:
 				printf("tracey rename timer %s <NEW>\n", argv[3]);
 				return 0;
 			}
-			char* old = malloc(strlen(pathstr) + strlen(argv[3]) + 10);
-			char* new = malloc(strlen(pathstr) + strlen(argv[4]) + 10);
-			sprintf(old, "%s%s.timer", pathstr, argv[3]);
-			sprintf(new, "%s%s.timer", pathstr, argv[4]);
+			make_str(old, "%s%s.timer", pathstr, argv[3]);
+			make_str(new, "%s%s.timer", pathstr, argv[4]);	
 			rename(old, new);
 			free(old);
 			free(new);
@@ -382,10 +391,8 @@ general_help:
 				printf("tracey rename item %s <NEW>\n", argv[3]);
 				return 0;
 			}
-			char* old = malloc(strlen(pathstr) + strlen(argv[3]) + 10);
-			char* new = malloc(strlen(pathstr) + strlen(argv[4]) + 10);
-			sprintf(old, "%s%s.timer", pathstr, argv[3]);
-			sprintf(new, "%s%s.timer", pathstr, argv[4]);
+			make_str(old, "%s%s.item", pathstr, argv[3]);
+			make_str(new, "%s%s.item", pathstr, argv[4]);
 			rename(old, new);
 			free(old);
 			free(new);
@@ -396,9 +403,7 @@ general_help:
 	}
 	time_t now = time(NULL);
 	struct tm *local = localtime(&now);
-	char* name = malloc(64 + strlen(pathstr));
-	sprintf(name, "%s%02d-%02d-%04d.trace", pathstr, local->tm_mday, local->tm_mon + 1, local->tm_year + 1900);
-
+	make_str(name, "%s%02d-%02d-%04d.trace", pathstr, local->tm_mday, local->tm_mon + 1, local->tm_year + 1900);
 	FILE* fileptr = fopen(name, "r+");
 	if (fileptr == NULL) {
 		err(FILE_OPEN_FAIL);

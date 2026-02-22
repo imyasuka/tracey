@@ -188,6 +188,7 @@ int main(int argc, char** argv, char** envp) {
 general_help:
 		printf("\n");
 		printf("tracey help					               prints this help screen\n");
+		printf("MOST OF THE COMMANDS DO NOT WORK YET, USE THIS SCREEN TO SEE WHAT WILL GET ADDED\n");
 		printf("\n");
 		tracey_help_timer();
 		printf("\n");

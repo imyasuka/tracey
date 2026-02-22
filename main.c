@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <sys/stat.h>
+#include <errno.h>
 
 #define arg(i, x) (strcmp(argv[i], x) == 0)
 
@@ -17,6 +19,7 @@
 #define NEW_NOT_SPECIFIED       9
 #define ITEM_NOT_SPECIFIED      10
 #define TYPE_INVALID            11
+#define PATH_SET_FAIL           12
 
 const char* err_code[] = {
 	"Error: Variable not specified.",
@@ -30,7 +33,8 @@ const char* err_code[] = {
 	"Error: Type not specified.",
 	"Error: New name not specified.",
 	"Error: Item not specified.",
-	"Error: Invalid type."
+	"Error: Invalid type.",
+	"Error: Failed to set path."
 };
 
 void err(size_t n) {
@@ -117,6 +121,12 @@ void trace_add_line(trace* file, const char* line) {
 	strcpy(file->trace[file->lines - 1], line);
 }
 
+void tracey_help_meta() {
+	printf("tracey help meta                                prints this section of the help screen\n");
+	printf("tracey path                                               output where tracey operates\n");
+	printf("tracey path <PATH>                                set <PATH> where tracey will operate\n");
+}
+
 void tracey_help_timer() {
 	printf("tracey help timer				prints this section of the help screen\n");
 	printf("tracey start <TIMER>					 	       creates <TIMER>\n");
@@ -165,8 +175,17 @@ int main(int argc, char** argv, char** envp) {
 		printf("Type \"tracey help\" for more info.\n");
 		return 0;
 	}
+	if (arg(1, "path")) {
+		return 0;	
+	}
 	if (arg(1, "help")) {
 		if (argc == 2) goto general_help;
+		if (arg(2, "meta")) {
+			printf("\n");
+			tracey_help_meta();
+			printf("\n");
+			return 0;
+		}
 		if (arg(2, "timer")) {
 			printf("\n");
 			tracey_help_timer();
@@ -189,6 +208,8 @@ general_help:
 		printf("\n");
 		printf("tracey help					               prints this help screen\n");
 		printf("MOST OF THE COMMANDS DO NOT WORK YET, USE THIS SCREEN TO SEE WHAT WILL GET ADDED\n");
+		printf("\n");
+		tracey_help_meta();
 		printf("\n");
 		tracey_help_timer();
 		printf("\n");

@@ -335,8 +335,8 @@ general_help:
 			printf("tracey stop <TIMER>\n");
 			return 0;
 		}
-		char* timer_name = malloc(strlen(argv[2]) + 10);
-		sprintf(timer_name, "%s.timer", argv[2]);
+		char* timer_name = malloc(strlen(pathstr) + strlen(argv[2]) + 10);
+		sprintf(timer_name, "%s%s.timer", pathstr, argv[2]);
 		int res = remove(timer_name);
 		free(timer_name);
 		if (res != 0) {
@@ -362,10 +362,10 @@ general_help:
 				printf("tracey rename timer %s <NEW>\n", argv[3]);
 				return 0;
 			}
-			char* old = malloc(strlen(argv[3]) + 10);
-			char* new = malloc(strlen(argv[4]) + 10);
-			sprintf(old, "%s.timer", argv[3]);
-			sprintf(new, "%s.timer", argv[4]);
+			char* old = malloc(strlen(pathstr) + strlen(argv[3]) + 10);
+			char* new = malloc(strlen(pathstr) + strlen(argv[4]) + 10);
+			sprintf(old, "%s%s.timer", pathstr, argv[3]);
+			sprintf(new, "%s%s.timer", pathstr, argv[4]);
 			rename(old, new);
 			free(old);
 			free(new);
@@ -382,10 +382,10 @@ general_help:
 				printf("tracey rename item %s <NEW>\n", argv[3]);
 				return 0;
 			}
-			char* old = malloc(strlen(argv[3]) + 10);
-			char* new = malloc(strlen(argv[4]) + 10);
-			sprintf(old, "%s.timer", argv[3]);
-			sprintf(new, "%s.timer", argv[4]);
+			char* old = malloc(strlen(pathstr) + strlen(argv[3]) + 10);
+			char* new = malloc(strlen(pathstr) + strlen(argv[4]) + 10);
+			sprintf(old, "%s%s.timer", pathstr, argv[3]);
+			sprintf(new, "%s%s.timer", pathstr, argv[4]);
 			rename(old, new);
 			free(old);
 			free(new);
@@ -396,8 +396,8 @@ general_help:
 	}
 	time_t now = time(NULL);
 	struct tm *local = localtime(&now);
-	char* name = malloc(64);
-	sprintf(name, "%02d-%02d-%04d.trace", local->tm_mday, local->tm_mon + 1, local->tm_year + 1900);
+	char* name = malloc(64 + strlen(pathstr));
+	sprintf(name, "%s%02d-%02d-%04d.trace", pathstr, local->tm_mday, local->tm_mon + 1, local->tm_year + 1900);
 
 	FILE* fileptr = fopen(name, "r+");
 	if (fileptr == NULL) {

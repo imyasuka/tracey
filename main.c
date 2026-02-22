@@ -175,8 +175,66 @@ int main(int argc, char** argv, char** envp) {
 		printf("Type \"tracey help\" for more info.\n");
 		return 0;
 	}
+	FILE* path = fopen(".tracey/PATH", "r");
+	char* pathstr = NULL;
+	if (path != NULL) {
+		pathstr = read_line(path);
+		if (pathstr[strlen(pathstr)-1] != '/') {
+			char* newpathstr = malloc(sizeof(char) * (strlen(pathstr) + 2));
+			strcpy(newpathstr, pathstr);
+			newpathstr[strlen(pathstr)] = '/';
+			newpathstr[strlen(pathstr)+1] = '\0';
+			free(pathstr);
+			pathstr = newpathstr;
+		}
+		fclose(path);
+	}
 	if (arg(1, "path")) {
-		return 0;	
+		if (argc == 2) {
+			if (pathstr == NULL || strlen(pathstr) == 0) {
+				printf(".\n");
+				if (pathstr) free(pathstr);
+				return 0;
+			}
+			printf("%s\n", pathstr);
+			free(pathstr);
+			return 0;
+		}
+		if (pathstr) free(pathstr);
+		path = fopen(".tracey/PATH", "w+");
+		if (path != NULL) goto dir_exists;
+		const char* dir = ".tracey";
+		mode_t mode = 0755;
+		if (mkdir(dir, mode) == 0) {
+			path = fopen(".tracey/PATH", "w+");
+		dir_exists:
+			struct stat s;
+			if (path == NULL) {
+				goto path_set_fail;
+			}
+			if (stat(argv[2], &s) != 0) {
+				fclose(path);
+				goto path_set_fail;
+			}
+			if (S_ISDIR(s.st_mode) == 0) {
+				fclose(path);
+				goto path_set_fail;
+			}
+			if (fprintf(path, "%s", argv[2]) < 0) {
+				fclose(path);
+				goto path_set_fail;	
+			}
+			fclose(path);
+			if (argv[2][strlen(argv[2])-1] == '/')
+				printf("Success: Path set to %s.\n", argv[2]);
+			else 
+				printf("Success: Path set to %s/.\n", argv[2]);
+			return 0;
+		} else {
+path_set_fail:
+			err(PATH_SET_FAIL);
+			return 0;
+		}
 	}
 	if (arg(1, "help")) {
 		if (argc == 2) goto general_help;
